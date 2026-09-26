@@ -56,7 +56,7 @@ export function HeroStory({ data }: { data: HeroData }) {
         {/* poster: server-rendered LCP image, cross-fades to live WebGL once ready */}
         <motion.div className="absolute inset-0 flex items-center justify-center" animate={{ opacity: gl && ready ? 0 : 1 }} transition={{ duration: 0.5 }}>
           <div className="relative h-[52svh] w-[min(76vw,460px)] -translate-y-[9svh]">
-            <Image src={data.posters[metal]} alt={`${data.name} in ${metal} gold`} fill preload sizes="(min-width:768px) 520px, 80vw" className="object-contain" />
+            <Image src={data.posters[metal]} alt={`${data.name} in ${metal} gold`} fill preload sizes="(min-width:768px) 520px, 80vw" className="jewel-shot" />
           </div>
         </motion.div>
         {gl && (

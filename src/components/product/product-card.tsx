@@ -28,7 +28,7 @@ export function ProductCard({ p, priority = false, sizes = "(min-width:1280px) 2
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
             sizes={sizes}
-            className="object-contain transition-[opacity,transform] duration-[900ms] ease-[var(--ease-expo)] group-hover:scale-[1.04] group-hover:opacity-0"
+            className="jewel-shot transition-opacity duration-[900ms] ease-[var(--ease-expo)] group-hover:opacity-0"
           />
           <Image
             src={productImage(p, p.defaultMetal, p.defaultGem, "detail")}
@@ -36,7 +36,7 @@ export function ProductCard({ p, priority = false, sizes = "(min-width:1280px) 2
             fill
             sizes={sizes}
             loading="lazy"
-            className="scale-[1.06] object-contain opacity-0 transition-[opacity,transform] duration-[900ms] ease-[var(--ease-expo)] group-hover:scale-100 group-hover:opacity-100"
+            className="jewel-shot opacity-0 transition-opacity duration-[900ms] ease-[var(--ease-expo)] group-hover:opacity-100"
           />
           {(p.badges.length > 0 || unavailable) && (
             <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">

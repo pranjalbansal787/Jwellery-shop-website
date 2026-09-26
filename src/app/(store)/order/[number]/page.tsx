@@ -51,7 +51,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
           <ul className="divide-y divide-line border-y border-line">
             {order.items.map((it) => (
               <li key={it.variantId + (it.size ?? "")} className="flex gap-5 py-5">
-                <div className="relative h-24 w-20 shrink-0 stage"><Image src={it.image} alt="" fill sizes="80px" className="object-contain" /></div>
+                <div className="relative h-24 w-20 shrink-0 stage overflow-hidden"><Image src={it.image} alt="" fill sizes="80px" className="jewel-shot-sm" /></div>
                 <div className="flex-1">
                   <p className="font-display text-xl">{it.name}</p>
                   <p className="text-[12.5px] text-muted">{it.purity} {METAL_LABEL[it.metal]}{it.gem !== "none" ? ` · ${GEM_LABEL[it.gem]}` : ""}{it.size ? ` · Size ${it.size}` : ""} · Qty {it.qty}</p>

@@ -121,7 +121,7 @@ export function ProductExperience({ p, collectionName, initialMetal }: { p: Prod
         {/* ------------------------------------------------ gallery */}
         <div className="lg:col-span-7">
           <div className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
-            <div ref={mainImg} className="relative aspect-[4/5] overflow-hidden stage md:aspect-[5/5]">
+            <div ref={mainImg} className="relative aspect-[4/5] overflow-hidden stage md:aspect-square">
               <AnimatePresence mode="wait" initial={false}>
                 {gallery[media].kind === "image" ? (
                   <motion.button
@@ -158,7 +158,7 @@ export function ProductExperience({ p, collectionName, initialMetal }: { p: Prod
                   className={cn("relative h-20 w-16 overflow-hidden stage transition-opacity md:h-24 md:w-20", media === i ? "ring-1 ring-fg" : "opacity-60 hover:opacity-100")}
                   aria-label={m.kind === "3d" ? "3D view" : `Image ${i + 1}`}
                 >
-                  {m.kind === "image" ? <Image src={m.src} alt="" fill sizes="80px" className="object-contain" /> : <span className="flex h-full items-center justify-center text-[10px] uppercase tracking-[0.18em]">360°</span>}
+                  {m.kind === "image" ? <Image src={m.src} alt="" fill sizes="80px" className="jewel-shot-sm" /> : <span className="flex h-full items-center justify-center text-[10px] uppercase tracking-[0.18em]">360°</span>}
                 </button>
               ))}
               <button onClick={() => setDialog("tryon")} className="ml-auto flex items-center gap-2 self-center border border-line px-4 py-2.5 text-[11px] uppercase tracking-[0.18em] hover:border-fg" data-cursor="try">
@@ -341,7 +341,7 @@ function ZoomImage({ src, alt, priority }: { src: string; alt: string; priority?
       }}
       onPointerLeave={() => setOrigin(null)}
     >
-      <Image src={src} alt={alt} fill loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} sizes="(min-width:1024px) 58vw, 100vw" className="object-contain transition-transform duration-500 ease-[var(--ease-expo)]" style={{ transform: origin ? "scale(1.8)" : "scale(1)", transformOrigin: origin ?? "50% 50%" }} />
+      <Image src={src} alt={alt} fill priority={!!priority} sizes="(min-width:1024px) 58vw, 100vw" className="jewel-shot transition-transform duration-500 ease-[var(--ease-expo)]" style={{ transform: origin ? "scale(1.8)" : "scale(1)", transformOrigin: origin ?? "50% 50%" }} />
     </div>
   );
 }
@@ -351,7 +351,7 @@ function PanZoom({ src, alt }: { src: string; alt: string }) {
   return (
     <div className="relative h-full min-h-[60vh] overflow-hidden stage" data-cursor="drag">
       <motion.div drag dragElastic={0.1} dragConstraints={{ left: -400, right: 400, top: -400, bottom: 400 }} className="absolute inset-0" style={{ scale: z }}>
-        <Image src={src} alt={alt} fill sizes="100vw" quality={90} className="pointer-events-none object-contain" draggable={false} />
+        <Image src={src} alt={alt} fill sizes="100vw" quality={90} className="pointer-events-none jewel-shot" draggable={false} />
       </motion.div>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 border border-line bg-bg/80 px-3 py-2 backdrop-blur">
         <span className="text-[11px] uppercase tracking-[0.16em] text-muted">Zoom</span>

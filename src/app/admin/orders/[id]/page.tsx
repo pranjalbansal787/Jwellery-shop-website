@@ -23,7 +23,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ id: st
             <ul className="divide-y divide-line">
               {o.items.map((it) => (
                 <li key={it.variantId + (it.size ?? "")} className="flex items-center gap-4 px-5 py-4">
-                  <div className="relative h-14 w-14 shrink-0 stage"><Image src={it.image} alt="" fill sizes="56px" className="object-contain" /></div>
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden stage"><Image src={it.image} alt="" fill sizes="56px" className="jewel-shot-sm" /></div>
                   <div className="min-w-0 flex-1">
                     <p>{it.name}</p>
                     <p className="text-[12px] text-muted">{it.sku} · {it.purity} {METAL_LABEL[it.metal]}{it.gem !== "none" ? ` · ${GEM_LABEL[it.gem]}` : ""}{it.size ? ` · Size ${it.size}` : ""}{it.engraving ? ` · Engrave “${it.engraving}”` : ""}</p>

@@ -144,7 +144,7 @@ export function Booking({ stores, initialService, initialStore, product }: { sto
           <p className="kicker text-muted">Your appointment</p>
           {product && (
             <div className="mt-5 flex items-center gap-4 border-b border-line pb-5">
-              <div className="relative h-20 w-16 stage"><Image src={product.image} alt="" fill sizes="64px" className="object-contain" /></div>
+              <div className="relative h-20 w-16 stage overflow-hidden"><Image src={product.image} alt="" fill sizes="64px" className="jewel-shot-sm" /></div>
               <div><p className="text-[12px] text-muted">To view</p><p className="font-display text-lg">{product.name}</p></div>
             </div>
           )}

@@ -92,7 +92,7 @@ export function BrandEditor({ initial, canEdit }: { initial: Brand; canEdit: boo
                 <span className="mt-4 inline-block px-4 py-2 text-[9px] uppercase tracking-[0.2em]" style={{ background: "var(--foreground)", color: "var(--background)", borderRadius: "var(--radius-button)" }}>Discover</span>
               </div>
               <div className="relative aspect-[4/5]" style={{ background: "var(--stage)" }}>
-                <Image src={`/renders/elan-solitaire-ring--${b.theme === "platinum" || b.theme === "sapphire" ? "white" : b.theme === "rose" ? "rose" : "yellow"}--diamond--front.webp`} alt="" fill sizes="200px" className="object-contain" />
+                <Image src={`/renders/elan-solitaire-ring--${b.theme === "platinum" || b.theme === "sapphire" ? "white" : b.theme === "rose" ? "rose" : "yellow"}--diamond--front.webp`} alt="" fill sizes="200px" className="jewel-shot" />
               </div>
             </div>
             <div className="flex items-center justify-between border-t px-5 py-3 text-[11px]" style={{ borderColor: "var(--border)" }}>

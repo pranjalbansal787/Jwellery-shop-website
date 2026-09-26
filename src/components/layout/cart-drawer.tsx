@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCart, cartSubtotal } from "@/stores/cart";
-import { useLockBody, useHydrated } from "@/lib/hooks";
+import { useLockBody, useHydrated, useFocusTrap, useInert } from "@/lib/hooks";
 import { IconClose, IconGift, IconMinus, IconPlus } from "@/components/ui/icons";
 import { useMoney } from "@/components/providers/brand-provider";
 import { METAL_LABEL, GEM_LABEL, deliveryEstimate } from "@/lib/labels";
@@ -16,7 +16,10 @@ export function CartDrawer({ suggestions }: { suggestions: { slug: string; name:
   const money = useMoney();
   const pathname = usePathname();
   const [msgOpen, setMsgOpen] = useState(false);
+  const panel = useRef<HTMLElement>(null);
   useLockBody(open);
+  useFocusTrap(open, panel);
+  useInert(open);
   useEffect(() => setOpen(false), [pathname, setOpen]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -36,6 +39,7 @@ export function CartDrawer({ suggestions }: { suggestions: { slug: string; name:
         <>
           <motion.div className="fixed inset-0 bg-black/55" style={{ zIndex: "var(--z-drawer)" as unknown as number }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
           <motion.aside
+            ref={panel}
             role="dialog"
             aria-modal="true"
             aria-label="Shopping bag"
@@ -63,7 +67,7 @@ export function CartDrawer({ suggestions }: { suggestions: { slug: string; name:
                     {items.map((l) => (
                       <motion.li key={l.key} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, height: 0 }} className="flex gap-4 py-6">
                         <Link href={l.slug ? `/products/${l.slug}` : "/configure"} className="relative h-28 w-24 shrink-0 stage">
-                          <Image src={l.image} alt={l.name} fill sizes="96px" className="object-contain" />
+                          <Image src={l.image} alt={l.name} fill sizes="96px" className="jewel-shot-sm" />
                         </Link>
                         <div className="flex min-w-0 flex-1 flex-col">
                           <div className="flex justify-between gap-3">
@@ -93,7 +97,7 @@ export function CartDrawer({ suggestions }: { suggestions: { slug: string; name:
                       <div className="mt-4 grid grid-cols-2 gap-4">
                         {recs.map((r) => (
                           <Link key={r.slug} href={`/products/${r.slug}`} className="group" data-cursor="view">
-                            <div className="relative aspect-square stage"><Image src={r.image} alt="" fill sizes="180px" className="object-contain transition-transform duration-700 group-hover:scale-105" /></div>
+                            <div className="relative aspect-square stage overflow-hidden"><Image src={r.image} alt="" fill sizes="180px" className="jewel-shot" /></div>
                             <p className="mt-2 text-[12.5px]">{r.name}</p>
                             <p className="text-[12px] text-muted">{money(r.price)}</p>
                           </Link>

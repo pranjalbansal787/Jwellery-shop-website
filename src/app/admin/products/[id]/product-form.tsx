@@ -79,8 +79,8 @@ export function ProductForm({ product, image, detail, categories, collections, p
         </Card>
         <Card title="Media">
           <div className="grid grid-cols-2 gap-2">
-            <div className="relative aspect-[4/5] stage"><Image src={image} alt="" fill sizes="160px" className="object-contain" /></div>
-            <div className="relative aspect-[4/5] stage"><Image src={detail} alt="" fill sizes="160px" className="object-contain" /></div>
+            <div className="relative aspect-[4/5] stage overflow-hidden"><Image src={image} alt="" fill sizes="160px" className="jewel-shot" /></div>
+            <div className="relative aspect-[4/5] stage overflow-hidden"><Image src={detail} alt="" fill sizes="160px" className="jewel-shot" /></div>
           </div>
           <p className="mt-3 text-[12px] text-muted">Demo media are studio renders of the procedural 3D model ({product.design}). Uploads, 360° sets and GLB models arrive with the Media module (signed S3 uploads, AVIF/WebP variants, Draco/KTX2 optimisation queue).</p>
           <p className="mt-2 text-[12px] text-muted">From {inr(Math.min(...variants.map((v) => v.price)))}</p>

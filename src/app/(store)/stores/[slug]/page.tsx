@@ -43,7 +43,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
             <a href={`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`} target="_blank" rel="noopener" className="btn btn-outline">Directions</a>
           </div>
         </div>
-        <div className="relative aspect-square stage">{sample && <Image src={productImage(sample)} alt="" fill sizes="50vw" className="object-contain p-12" />}</div>
+        <div className="relative aspect-square stage">{sample && <Image src={productImage(sample)} alt="" fill sizes="50vw" className="jewel-shot" />}</div>
       </div>
     </div>
   );

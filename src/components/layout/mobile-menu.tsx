@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useUi } from "@/stores/ui";
-import { useLockBody } from "@/lib/hooks";
+import { useLockBody, useFocusTrap, useInert } from "@/lib/hooks";
 import { IconChevron, IconClose, IconWhatsApp } from "@/components/ui/icons";
 import { useBrand } from "@/components/providers/brand-provider";
 import { waLink, waMessage } from "@/lib/whatsapp";
@@ -15,7 +15,10 @@ export function MobileMenu({ nav }: { nav: NavData }) {
   const { brand } = useBrand();
   const pathname = usePathname();
   const [open, setOpen] = useState<string | null>(null);
+  const panel = useRef<HTMLDivElement>(null);
   useLockBody(menuOpen);
+  useFocusTrap(menuOpen, panel);
+  useInert(menuOpen);
   useEffect(() => setMenu(false), [pathname, setMenu]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => e.key === "Escape" && setMenu(false);
@@ -32,6 +35,7 @@ export function MobileMenu({ nav }: { nav: NavData }) {
     <AnimatePresence>
       {menuOpen && (
         <motion.div
+          ref={panel}
           role="dialog"
           aria-modal="true"
           aria-label="Menu"

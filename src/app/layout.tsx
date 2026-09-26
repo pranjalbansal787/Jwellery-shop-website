@@ -57,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-theme={themeId}
       data-scheme={THEMES[themeId].scheme}
       data-motion={brand.motion}
+      data-scroll-behavior="smooth"
       style={{ ...vars, colorScheme: THEMES[themeId].scheme } as React.CSSProperties}
       className={`${cormorant.variable} ${dm.variable} ${playfair.variable} ${inter.variable} ${bodoni.variable} ${manrope.variable}`}
       suppressHydrationWarning

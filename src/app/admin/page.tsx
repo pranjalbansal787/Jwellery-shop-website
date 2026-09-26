@@ -97,7 +97,7 @@ export default async function Dashboard() {
             {db.orders.slice(0, 7).map((o) => (
               <li key={o.id}>
                 <Link href={`/admin/orders/${o.id}`} className="flex items-center gap-4 px-5 py-3 hover:bg-elevated">
-                  <div className="relative h-10 w-10 shrink-0 stage"><Image src={o.items[0].image} alt="" fill sizes="40px" className="object-contain" /></div>
+                  <div className="relative h-10 w-10 shrink-0 overflow-hidden stage"><Image src={o.items[0].image} alt="" fill sizes="40px" className="jewel-shot-sm" /></div>
                   <div className="min-w-0 flex-1"><p className="truncate text-[13px]">{o.items[0].name}{o.items.length > 1 ? ` + ${o.items.length - 1}` : ""}</p><p className="text-[12px] text-muted">{o.number} · {when(o.createdAt)}</p></div>
                   <span className="hidden sm:inline"><Pill tone={ORDER_TONE[o.status]}>{o.status.replace(/_/g, " ")}</Pill></span>
                   <p className="shrink-0 text-right text-[13px] sm:w-24">{inr(o.total)}</p>

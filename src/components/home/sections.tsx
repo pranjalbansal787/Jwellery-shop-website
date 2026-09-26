@@ -56,13 +56,13 @@ function CollectionTile({ c, className, tall }: { c: { slug: string; name: strin
   const ref = useRef<HTMLAnchorElement>(null);
   const level = useMotionLevel();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, (v) => (30 - 60 * v) * level);
+  const y = useTransform(scrollYProgress, (v) => (12 - 24 * v) * level);
   return (
     <Reveal className={className}>
       <Link ref={ref} href={`/collections/${c.slug}`} className="group relative block h-full overflow-hidden stage" data-cursor="explore">
         <div className={tall ? "aspect-[4/5] md:aspect-auto md:h-full md:min-h-[720px]" : "aspect-[16/11]"}>
-          <motion.div style={{ y }} className="absolute inset-[-6%]">
-            <Image src={c.heroImage} alt="" fill sizes={tall ? "(min-width:768px) 58vw, 100vw" : "(min-width:768px) 42vw, 100vw"} className="object-contain p-[10%] transition-transform duration-[1.6s] ease-[var(--ease-expo)] group-hover:scale-[1.05]" />
+          <motion.div style={{ y }} className="absolute inset-0">
+            <Image src={c.heroImage} alt="" fill sizes={tall ? "(min-width:768px) 58vw, 100vw" : "(min-width:768px) 42vw, 100vw"} className="jewel-shot" />
           </motion.div>
         </div>
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 via-bg/30 to-transparent p-6 md:p-9">
@@ -126,8 +126,8 @@ export function Craftsmanship({ image, detail }: { image: string; detail: string
       <div className="container-x grid-editorial section-y items-center gap-y-14">
         <div className="col-span-4 md:col-span-8 lg:col-span-6">
           <div className="relative grid grid-cols-5 gap-4">
-            <Reveal className="relative col-span-3 aspect-[3/4] stage"><Image src={image} alt="A ring on the setter's bench" fill sizes="(min-width:1024px) 30vw, 60vw" className="object-contain p-6" /></Reveal>
-            <Reveal delay={0.15} className="relative col-span-2 mt-24 aspect-[3/4] stage"><Image src={detail} alt="Close view of claw setting" fill sizes="(min-width:1024px) 20vw, 40vw" className="object-contain p-4" /></Reveal>
+            <Reveal className="relative col-span-3 aspect-[3/4] stage"><Image src={image} alt="A ring on the setter's bench" fill sizes="(min-width:1024px) 30vw, 60vw" className="jewel-shot" /></Reveal>
+            <Reveal delay={0.15} className="relative col-span-2 mt-24 aspect-[3/4] stage"><Image src={detail} alt="Close view of claw setting" fill sizes="(min-width:1024px) 20vw, 40vw" className="jewel-shot" /></Reveal>
           </div>
         </div>
         <div className="col-span-4 md:col-span-8 lg:col-span-5 lg:col-start-8">
@@ -191,7 +191,9 @@ export function CategoryGrid({ items }: { items: { slug: string; name: string; i
           <Reveal as="li" key={c.slug} delay={i * 0.05}>
             <Link href={`/shop/${c.slug}`} className="group block" data-cursor="view">
               <div className="relative aspect-square overflow-hidden rounded-full stage">
-                <Image src={c.image} alt="" fill sizes="(min-width:1280px) 15vw, (min-width:768px) 30vw, 45vw" className="object-contain p-[14%] transition-transform duration-[1.2s] ease-[var(--ease-expo)] group-hover:scale-110" />
+                <div className="absolute inset-[18%] transition-transform duration-[1.2s] ease-[var(--ease-expo)] group-hover:scale-105">
+                  <Image src={c.image} alt="" fill sizes="(min-width:1280px) 15vw, (min-width:768px) 30vw, 45vw" className="object-contain" />
+                </div>
               </div>
               <p className="mt-4 text-center font-display text-xl">{c.name}</p>
               <p className="text-center text-[12px] text-muted">{c.count} pieces</p>
@@ -259,7 +261,7 @@ export function ConciergeBand({ image }: { image: string }) {
     <section className="container-x section-y">
       <div className="grid overflow-hidden bg-surface md:grid-cols-2">
         <div className="relative min-h-[360px] stage">
-          <Image src={image} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-contain p-12" />
+          <Image src={image} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="jewel-shot" />
         </div>
         <div className="flex flex-col justify-center p-8 md:p-14">
           <Reveal><p className="kicker text-accent">Private appointments</p></Reveal>

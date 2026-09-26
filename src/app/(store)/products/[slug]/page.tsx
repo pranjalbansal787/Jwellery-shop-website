@@ -48,7 +48,7 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
       <section className="border-y border-line bg-surface">
         <div className="container-x grid items-center gap-12 py-20 md:grid-cols-2 md:py-28">
           <div className="relative aspect-square stage">
-            <Image src={productImage(p, p.defaultMetal, p.defaultGem, "detail")} alt={`${p.name} craftsmanship detail`} fill sizes="(min-width:768px) 50vw, 100vw" className="object-contain p-10" />
+            <Image src={productImage(p, p.defaultMetal, p.defaultGem)} alt={`${p.name} craftsmanship`} fill sizes="(min-width:768px) 50vw, 100vw" className="jewel-shot" />
           </div>
           <div>
             <Reveal><p className="kicker text-accent">The making</p></Reveal>

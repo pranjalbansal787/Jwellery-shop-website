@@ -36,7 +36,23 @@ export function CheckoutFlow({ stores }: { stores: { id: string; name: string; c
   const [couponMsg, setCouponMsg] = useState<string | null>(null);
   const set = (k: keyof typeof f, v: string | boolean) => setF((s) => ({ ...s, [k]: v }));
 
+  const cartKey = lines.map((l) => `${l.key}:${l.qty}`).join("|");
   useEffect(() => { if (hydrated && lines.length) track("checkout_started", { items: lines.length, value: cartSubtotal(lines) }); }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!discount?.code) return;
+    const code = discount.code;
+    const next = lines.map((l) => ({ variantId: l.variantId, qty: l.qty, size: l.size, engraving: l.engraving, image: l.variantId.startsWith("cfg:") ? l.image : undefined }));
+    let cancelled = false;
+    (async () => {
+      const r = await quoteCoupon(code, next);
+      if (cancelled) return;
+      if (r.ok) setDiscount({ amount: r.discount, code, description: r.description });
+      else { setDiscount(null); setCouponMsg(r.error); }
+    })();
+    return () => { cancelled = true; };
+    // Re-quote only when the bag changes, not when the quote itself updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartKey]);
 
   if (!hydrated) return <div className="container-x py-24"><div className="skeleton h-96 w-full" /></div>;
   if (lines.length === 0) {
@@ -159,7 +175,7 @@ export function CheckoutFlow({ stores }: { stores: { id: string; name: string; c
           <ul className="mt-5 divide-y divide-line">
             {lines.map((l) => (
               <li key={l.key} className="flex gap-4 py-4">
-                <div className="relative h-20 w-16 shrink-0 stage"><Image src={l.image} alt="" fill sizes="64px" className="object-contain" /><span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-fg text-[10px] text-bg">{l.qty}</span></div>
+                <div className="relative h-20 w-16 shrink-0 stage overflow-hidden"><Image src={l.image} alt="" fill sizes="64px" className="jewel-shot-sm" /><span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-fg text-[10px] text-bg">{l.qty}</span></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[14px]">{l.name}</p>
                   <p className="text-[12px] text-muted">{l.purity} {METAL_LABEL[l.metal]}{l.gem !== "none" ? ` · ${GEM_LABEL[l.gem]}` : ""}{l.size ? ` · Size ${l.size}` : ""}</p>

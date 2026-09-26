@@ -30,7 +30,7 @@ export default async function CollectionPage({ params, searchParams }: { params:
             <p className="lede mt-6 max-w-md">{c.description}</p>
           </div>
           <div className="relative aspect-[4/3] stage md:col-span-6">
-            <Image src={c.heroImage} alt="" fill preload sizes="(min-width:768px) 50vw, 100vw" className="object-contain p-[8%]" />
+            <Image src={c.heroImage} alt="" fill preload sizes="(min-width:768px) 50vw, 100vw" className="jewel-shot" />
           </div>
         </div>
       </section>

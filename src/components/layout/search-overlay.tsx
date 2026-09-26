@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useUi } from "@/stores/ui";
 import { useProfile } from "@/stores/profile";
-import { useLockBody, useHydrated } from "@/lib/hooks";
+import { useLockBody, useHydrated, useFocusTrap, useInert } from "@/lib/hooks";
 import { IconArrow, IconClose, IconSearch } from "@/components/ui/icons";
 import { useMoney } from "@/components/providers/brand-provider";
 import { track } from "@/lib/analytics";
@@ -28,10 +28,13 @@ export function SearchOverlay() {
   const [res, setRes] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const money = useMoney();
   useLockBody(searchOpen);
+  useFocusTrap(searchOpen, panel, { autofocus: false });
+  useInert(searchOpen);
 
   useEffect(() => setSearch(false), [pathname, setSearch]);
   useEffect(() => {
@@ -77,6 +80,7 @@ export function SearchOverlay() {
     <AnimatePresence>
       {searchOpen && (
         <motion.div
+          ref={panel}
           role="dialog"
           aria-modal="true"
           aria-label="Search"
@@ -149,7 +153,7 @@ export function SearchOverlay() {
                         <li key={p.slug}>
                           <Link href={`/products/${p.slug}`} className="group block" data-cursor="view">
                             <div className="relative aspect-[4/5] stage overflow-hidden">
-                              <Image src={p.image} alt={p.name} fill sizes="200px" className="object-contain transition-transform duration-700 group-hover:scale-105" />
+                              <Image src={p.image} alt={p.name} fill sizes="200px" className="jewel-shot" />
                             </div>
                             <p className="mt-2 text-[13.5px]">{p.name}</p>
                             <p className="text-[12.5px] text-muted">{money(p.price)}</p>

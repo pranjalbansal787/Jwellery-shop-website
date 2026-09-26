@@ -19,7 +19,7 @@ export default async function CollectionsPage() {
           <Reveal as="li" key={c.id} delay={(i % 2) * 0.1} className={i % 3 === 0 ? "md:col-span-2" : ""}>
             <Link href={`/collections/${c.slug}`} className="group grid items-center gap-8 md:grid-cols-2" data-cursor="explore">
               <div className={`relative overflow-hidden stage ${i % 3 === 0 ? "aspect-[16/10] md:order-2" : "aspect-[4/3] md:col-span-2"}`}>
-                <Image src={c.heroImage} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-contain p-[8%] transition-transform duration-[1.4s] ease-[var(--ease-expo)] group-hover:scale-105" />
+                <Image src={c.heroImage} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="jewel-shot" />
               </div>
               <div className={i % 3 === 0 ? "" : "md:col-span-2"}>
                 <p className="kicker text-muted">{c.kicker} · {c.productIds.length} pieces</p>

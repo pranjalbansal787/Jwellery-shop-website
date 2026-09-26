@@ -14,7 +14,7 @@ export function Dialog({ open, onClose, title, children, size = "md", className,
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
+    else if (!open && d.open) d.close();
   }, [open]);
   return (
     <dialog ref={ref} className="sheet" onClose={onClose} onCancel={(e) => { e.preventDefault(); onClose(); }} aria-label={title} onClick={(e) => { if (e.target === ref.current) onClose(); }}>

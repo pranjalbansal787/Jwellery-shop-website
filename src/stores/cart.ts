@@ -58,7 +58,7 @@ export const useCart = create<CartState>()(
         }),
       setQty: (key, qty) => set((s) => ({ lines: s.lines.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.min(5, qty)) } : x)) })),
       remove: (key) => set((s) => ({ lines: s.lines.filter((x) => x.key !== key) })),
-      clear: () => set({ lines: [], giftMessage: "" }),
+      clear: () => set({ lines: [], giftMessage: "", giftWrap: true }),
       setOpen: (open) => set({ open }),
       setGift: (giftWrap, giftMessage) => set((s) => ({ giftWrap, giftMessage: giftMessage ?? s.giftMessage })),
     }),

@@ -187,7 +187,7 @@ function JewelleryMega({ nav }: { nav: NavData }) {
       </div>
       <Link href="/shop/engagement-rings" className="group col-span-4 grid grid-cols-2 items-center gap-6 bg-surface p-6" data-cursor="view">
         <div className="relative aspect-[4/5] stage">
-          <Image src={nav.feature.image} alt="" fill sizes="220px" className="object-contain transition-transform duration-700 group-hover:scale-105" />
+          <Image src={nav.feature.image} alt="" fill sizes="220px" className="jewel-shot" />
         </div>
         <div>
           <p className="kicker text-accent">Engagement</p>
@@ -205,7 +205,7 @@ function CollectionsMega({ nav }: { nav: NavData }) {
       {nav.collections.slice(0, 4).map((c) => (
         <Link key={c.slug} href={`/collections/${c.slug}`} className="group" data-cursor="explore">
           <div className="relative aspect-[5/4] overflow-hidden stage">
-            <Image src={c.heroImage} alt="" fill sizes="25vw" className="object-contain p-4 transition-transform duration-[1.2s] ease-[var(--ease-expo)] group-hover:scale-[1.06]" />
+            <Image src={c.heroImage} alt="" fill sizes="25vw" className="jewel-shot" />
           </div>
           <p className="kicker mt-4 text-muted">{c.kicker}</p>
           <p className="mt-1 display-sm">{c.name}</p>

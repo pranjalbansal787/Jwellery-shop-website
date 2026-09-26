@@ -29,7 +29,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
             const stock = p.variants.reduce((n, v) => n + v.stock, 0);
             return (
               <tr key={p.id} className="hover:bg-elevated">
-                <Td className="w-14"><div className="relative h-11 w-11 stage"><Image src={productImage(p)} alt="" fill sizes="44px" className="object-contain" /></div></Td>
+                <Td className="w-14"><div className="relative h-11 w-11 overflow-hidden stage"><Image src={productImage(p)} alt="" fill sizes="44px" className="jewel-shot-sm" /></div></Td>
                 <Td><Link href={`/admin/products/${p.id}`} className="link-line">{p.name}</Link><span className="block text-[12px] text-muted">{p.sku} · {p.variants.length} variants</span></Td>
                 <Td className="text-muted">{db.categories.find((c) => c.id === p.categoryId)?.name}</Td>
                 <Td>{inr(Math.min(...prices))}{prices.length > 1 && Math.max(...prices) !== Math.min(...prices) ? ` – ${inr(Math.max(...prices))}` : ""}</Td>

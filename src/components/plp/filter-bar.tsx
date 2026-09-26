@@ -1,10 +1,10 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState, useTransition } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useDragControls } from "motion/react";
 import { FACETS, MULTI, SORTS, type FacetKey } from "@/lib/filters";
 import { IconChevron, IconClose, IconCheck } from "@/components/ui/icons";
-import { useLockBody } from "@/lib/hooks";
+import { useLockBody, useFocusTrap } from "@/lib/hooks";
 import { cn } from "@/lib/cn";
 
 type Counts = Record<FacetKey, Record<string, number>>;
@@ -151,13 +151,17 @@ function FacetOptions({ k, counts, s }: { k: FacetKey; counts: Counts; s: Return
 }
 
 function MobileSheet({ open, onClose, counts, s, total }: { open: boolean; onClose: () => void; counts: Counts; s: ReturnType<typeof useFilterState>; total: number }) {
+  const panel = useRef<HTMLDivElement>(null);
+  const drag = useDragControls();
   useLockBody(open);
+  useFocusTrap(open, panel);
   return (
     <AnimatePresence>
       {open && (
         <>
           <motion.div className="fixed inset-0 z-[65] bg-black/55" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
           <motion.div
+            ref={panel}
             role="dialog"
             aria-modal="true"
             aria-label="Filter and sort"
@@ -167,14 +171,18 @@ function MobileSheet({ open, onClose, counts, s, total }: { open: boolean; onClo
             exit={{ y: "100%" }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             drag="y"
+            dragControls={drag}
+            dragListener={false}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.4 }}
             onDragEnd={(_, i) => { if (i.offset.y > 120) onClose(); }}
           >
-            <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-line-strong" />
-            <div className="flex items-center justify-between px-5 py-3">
-              <p className="kicker">Filter & sort</p>
-              <button onClick={onClose} className="-mr-2 flex h-11 w-11 items-center justify-center" aria-label="Close"><IconClose /></button>
+            <div className="cursor-grab touch-none active:cursor-grabbing" onPointerDown={(e) => drag.start(e)}>
+              <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-line-strong" />
+              <div className="flex items-center justify-between px-5 py-3">
+                <p className="kicker">Filter & sort</p>
+                <button onPointerDown={(e) => e.stopPropagation()} onClick={onClose} className="-mr-2 flex h-11 w-11 items-center justify-center" aria-label="Close"><IconClose /></button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto px-5 pb-6">
               <p className="kicker mt-2 text-muted">Sort</p>

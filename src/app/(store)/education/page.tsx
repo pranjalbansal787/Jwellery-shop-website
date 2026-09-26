@@ -25,7 +25,7 @@ export default function EducationPage() {
             {[["#four-cs", "The 4Cs"], ["#metals", "Metals"], ["#hallmarking", "Hallmarking"], ["#gemstones", "Gemstones"], ["#care", "Care"]].map(([h, l]) => <a key={h} href={h} className="chip">{l}</a>)}
           </nav>
         </div>
-        <div className="relative aspect-square stage"><Image src={renderPath("odette-emerald-cut-ring", "platinum", "diamond", "detail")} alt="Emerald-cut diamond in a four-claw setting" fill preload sizes="50vw" className="object-contain p-10" /></div>
+        <div className="relative aspect-square stage"><Image src={renderPath("odette-emerald-cut-ring", "platinum", "diamond", "detail")} alt="Emerald-cut diamond in a four-claw setting" fill preload sizes="50vw" className="jewel-shot" /></div>
       </section>
       <section id="four-cs" className="border-t border-line">
         <div className="container-x py-16 md:py-24">
@@ -47,7 +47,7 @@ export default function EducationPage() {
           <h2 className="display-lg md:col-span-4">Precious metals</h2>
           {[["Yellow gold", "yellow", "Warm and traditional. 22K is richest in colour; 18K is harder-wearing for set stones."], ["White gold", "white", "Gold alloyed with white metals and rhodium-finished. Re-plating every few years keeps it bright."], ["Rose gold", "rose", "Copper gives the blush. Durable, and flattering on most skin tones."], ["Platinum", "platinum", "95% pure, naturally white and dense. It never fades and holds stones exceptionally securely."]].map(([t, m, d]) => (
             <div key={t}>
-              <div className="relative aspect-square stage"><Image src={renderPath("eterna-court-band", m as "yellow", "none")} alt={`${t} band`} fill sizes="25vw" className="object-contain p-6" /></div>
+              <div className="relative aspect-square stage"><Image src={renderPath("eterna-court-band", m as "yellow", "none")} alt={`${t} band`} fill sizes="25vw" className="jewel-shot" /></div>
               <p className="display-sm mt-4">{t}</p>
               <p className="mt-2 text-[13.5px] text-muted">{d}</p>
             </div>
@@ -66,7 +66,7 @@ export default function EducationPage() {
           <h2 className="display-lg md:col-span-3">Coloured gemstones</h2>
           {[["Emerald", "verdance-emerald-cocktail", "yellow", "emerald", "Soft by nature, with inclusions called jardin. Most emeralds are oiled to improve clarity, and we always disclose it."], ["Ruby", "maharani-ruby-cocktail", "yellow", "ruby", "The most prized show a pure, glowing red. Second only to diamond in hardness, ideal for daily wear."], ["Sapphire", "nocturne-sapphire-cocktail", "white", "sapphire", "Velvety blue, equally hard as ruby. Heat treatment is common and stable; untreated stones carry a premium."]].map(([t, slug, m, g, d]) => (
             <div key={t}>
-              <div className="relative aspect-[4/3] stage"><Image src={renderPath(slug, m as "yellow", g as "ruby")} alt={t} fill sizes="33vw" className="object-contain p-6" /></div>
+              <div className="relative aspect-[4/3] stage"><Image src={renderPath(slug, m as "yellow", g as "ruby")} alt={t} fill sizes="33vw" className="jewel-shot" /></div>
               <p className="display-sm mt-4">{t}</p>
               <p className="mt-2 text-[13.5px] text-muted">{d}</p>
             </div>
