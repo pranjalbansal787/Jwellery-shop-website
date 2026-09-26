@@ -35,7 +35,8 @@ export function HeroStory({ data }: { data: HeroData }) {
   const level = useMotionLevel();
   const money = useMoney();
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { margin: "0px 0px 0px 0px" });
+  const stage = useRef<HTMLDivElement>(null);
+  const inView = useInView(stage, { margin: "200px 0px 200px 0px" });
   const [gl, setGl] = useState(false);
   const [ready, setReady] = useState(false);
   const metal = THEME_METAL[themeId] ?? "yellow";
@@ -50,7 +51,7 @@ export function HeroStory({ data }: { data: HeroData }) {
 
   return (
     <section ref={ref} className="relative" style={{ height: story ? "280vh" : "100svh" }} aria-label="Featured: the Élan Solitaire">
-      <div className="sticky top-0 h-[100svh] overflow-hidden">
+      <div ref={stage} className="sticky top-0 h-[100svh] overflow-hidden">
         <div className="absolute inset-0 stage" />
         <div className="absolute inset-0" style={{ background: "radial-gradient(60% 50% at 50% 45%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 70%)" }} />
         {/* poster: server-rendered LCP image, cross-fades to live WebGL once ready */}

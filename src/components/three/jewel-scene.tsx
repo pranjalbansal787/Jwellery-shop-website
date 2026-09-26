@@ -9,18 +9,30 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "rea
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { MotionValue } from "motion/react";
-import { buildGemEnvironment, buildJewel, buildStudioEnvironment, frameObject, setGemEnvironment, type JewelSpec } from "@/lib/jewels/builders";
+import { buildJewel, buildStudioEnvironment, frameObject, type JewelSpec } from "@/lib/jewels/builders";
 
 function Studio() {
   const { gl, scene } = useThree();
+  const studioEnv = useRef<THREE.Texture | null>(null);
   useEffect(() => {
-    const env = buildStudioEnvironment(gl);
-    const gemEnv = buildGemEnvironment(gl);
-    scene.environment = env;
-    setGemEnvironment(gemEnv);
+    const setup = () => {
+      studioEnv.current?.dispose();
+      const env = buildStudioEnvironment(gl);
+      scene.environment = env;
+      studioEnv.current = env;
+    };
+    setup();
+    const canvas = gl.domElement;
+    const onLost = (e: Event) => e.preventDefault();
+    const onRestored = () => setup();
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
     return () => {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       scene.environment = null;
-      env.dispose();
+      studioEnv.current?.dispose();
+      studioEnv.current = null;
     };
   }, [gl, scene]);
   return null;
@@ -28,8 +40,24 @@ function Studio() {
 
 function useJewel(spec: JewelSpec) {
   const key = `${spec.design}|${spec.metal}|${spec.gem}|${spec.shape}|${spec.size}`;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => buildJewel(spec), [key]);
+  return useMemo(() => {
+    const obj = buildJewel(spec);
+    // Each canvas must own its materials — a shared cache cannot hold env maps from two WebGL contexts.
+    obj.traverse((o) => {
+      if (!(o instanceof THREE.Mesh) || !o.material) return;
+      const cloneOne = (m: THREE.Material) => {
+        const next = m.clone();
+        if (next instanceof THREE.MeshPhysicalMaterial) {
+          // Use this canvas's scene.environment. A texture from another WebGL context renders black.
+          next.envMap = null;
+        }
+        return next;
+      };
+      o.material = Array.isArray(o.material) ? o.material.map(cloneOne) : cloneOne(o.material);
+    });
+    return obj;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 }
 
 /* ------------------------------------------------------------------ hero */
@@ -64,9 +92,13 @@ function HeroJewel({ spec, progress, level }: { spec: JewelSpec; progress?: Moti
     const cam = camera as THREE.PerspectiveCamera;
     const zoom = 1 - Math.min(p, 1) * 0.42;
     const desired = base.current.target.clone().add(base.current.pos.clone().sub(base.current.target).multiplyScalar(zoom));
-    desired.x += pointer.x * 0.35 * level;
-    desired.y += pointer.y * 0.2 * level + p * 0.3;
-    cam.position.lerp(desired, 1 - Math.pow(0.001, dt));
+    const px = p < 0.04 ? 0 : pointer.x;
+    const py = p < 0.04 ? 0 : pointer.y;
+    desired.x += px * 0.35 * level;
+    desired.y += py * 0.2 * level + p * 0.3;
+    // Snap back at the top of the story so a fast scroll-up never leaves the camera inside the stone.
+    const k = p < 0.04 ? 1 : 1 - Math.pow(0.001, dt);
+    cam.position.lerp(desired, k);
     cam.lookAt(base.current.target.clone().setY(base.current.target.y + p * 0.35));
   });
 
@@ -77,11 +109,11 @@ function HeroJewel({ spec, progress, level }: { spec: JewelSpec; progress?: Moti
   );
 }
 
-export function HeroScene({ spec, progress, level = 1, active = true, onReady }: { spec: JewelSpec; progress?: MotionValue<number>; level?: number; active?: boolean; onReady?: () => void }) {
+export function HeroScene({ spec, progress, level = 1, active: _active = true, onReady }: { spec: JewelSpec; progress?: MotionValue<number>; level?: number; active?: boolean; onReady?: () => void }) {
   return (
     <Canvas
       dpr={[1, 1.75]}
-      frameloop={active ? "always" : "never"}
+      frameloop="always"
       gl={{ antialias: true, alpha: true, toneMapping: THREE.NeutralToneMapping, powerPreference: "high-performance" }}
       camera={{ fov: 24, near: 0.05, far: 100, position: [0, 0, 8] }}
       onCreated={() => onReady?.()}

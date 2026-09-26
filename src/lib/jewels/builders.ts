@@ -86,7 +86,7 @@ export function gemMaterial(gem: Exclude<GemKey, "none">, solid = false): THREE.
         roughness: 0.015,
         transparent: !solid,
         opacity: solid ? 1 : isDiamond ? 0.62 : 0.72,
-        depthWrite: true,
+        depthWrite: solid,
         flatShading: true,
         clearcoat: 1,
         clearcoatRoughness: 0,
@@ -97,6 +97,7 @@ export function gemMaterial(gem: Exclude<GemKey, "none">, solid = false): THREE.
         envMap: gemEnv,
       }),
     );
+    matCache.get(key)!.userData.isGem = true;
   }
   return matCache.get(key) as THREE.MeshPhysicalMaterial;
 }
@@ -164,21 +165,43 @@ function gemInnerMaterial(gem: Exclude<GemKey, "none">): THREE.MeshPhysicalMater
         envMap: gemEnv,
       }),
     );
+    matCache.get(key)!.userData.isGem = true;
   }
   return matCache.get(key) as THREE.MeshPhysicalMaterial;
+}
+
+function gemFillMaterial(gem: Exclude<GemKey, "none">): THREE.MeshBasicMaterial {
+  const key = `gem:fill:${gem}`;
+  if (!matCache.has(key)) {
+    matCache.set(
+      key,
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(GEM_COLORS[gem]).lerp(new THREE.Color("#ffffff"), gem === "diamond" ? 0.35 : 0),
+      }),
+    );
+  }
+  return matCache.get(key) as THREE.MeshBasicMaterial;
 }
 
 function gem(g: GemKey, shape: GemShape, radius: number, detail = 16): THREE.Object3D {
   const k = g === "none" ? "diamond" : g;
   const geo = gemGeometry(shape, radius > 0.15 ? Math.max(detail, 20) : detail);
   const group = new THREE.Group();
-  if (radius > 0.12) {
+  // Unlit fill: MeshPhysical gems with metalness 1 vanish against a dark page if the env map is missing.
+  const fill = new THREE.Mesh(geo, gemFillMaterial(k));
+  fill.scale.setScalar(0.93);
+  fill.userData.isGem = true;
+  group.add(fill);
+  if (radius > 0.12 && k !== "diamond") {
     const inner = new THREE.Mesh(geo, gemInnerMaterial(k));
+    inner.userData.isGem = true;
     inner.scale.setScalar(0.985);
     inner.rotation.y = Math.PI / (detail * 1.5);
     group.add(inner);
   }
-  group.add(new THREE.Mesh(geo, gemMaterial(k, radius <= 0.12)));
+  const crown = new THREE.Mesh(geo, gemMaterial(k, radius <= 0.12));
+  crown.userData.isGem = true;
+  group.add(crown);
   group.scale.setScalar(radius);
   return group;
 }
