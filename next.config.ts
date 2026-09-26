@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  serverExternalPackages: ["@mediapipe/tasks-vision"],
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [70, 80, 90],

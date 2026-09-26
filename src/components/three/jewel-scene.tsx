@@ -5,11 +5,12 @@
  */
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { MotionValue } from "motion/react";
 import { buildJewel, buildStudioEnvironment, frameObject, type JewelSpec } from "@/lib/jewels/builders";
+import type { TryOnAnchor, TryOnKind } from "@/lib/try-on/kind";
 
 function Studio() {
   const { gl, scene } = useThree();
@@ -152,6 +153,167 @@ function ViewerJewel({ spec, controls, autoRotate }: { spec: JewelSpec; controls
       <primitive object={obj} />
       <OrbitControls ref={controls} enablePan={false} enableDamping dampingFactor={0.08} autoRotate={autoRotate} autoRotateSpeed={0.8} makeDefault />
     </>
+  );
+}
+
+/* ------------------------------------------------------------------ try-on */
+
+const X_AXIS = new THREE.Vector3();
+const Y_AXIS = new THREE.Vector3();
+const Z_AXIS = new THREE.Vector3();
+const BASIS = new THREE.Matrix4();
+const CAM_DIR = new THREE.Vector3(0, 0, 1);
+
+function holeRef(kind: TryOnKind, design: JewelSpec["design"]) {
+  if (kind === "ring") return 1.05;
+  if (kind === "bangle") return 4.2;
+  if (kind === "bracelet") return 5.1;
+  if (kind === "necklace") return 5.4;
+  if (kind === "pendant") return 3.6;
+  if (design === "hoops") return 1.35;
+  if (design === "drops") return 1.15;
+  return 1.25;
+}
+
+function poseJewel(obj: THREE.Object3D, kind: TryOnKind, along: THREE.Vector3, twist: number) {
+  if (kind === "ring" || kind === "bangle") {
+    Z_AXIS.copy(along);
+    Y_AXIS.copy(CAM_DIR);
+    X_AXIS.crossVectors(Y_AXIS, Z_AXIS);
+    if (X_AXIS.lengthSq() < 1e-6) X_AXIS.set(1, 0, 0);
+    X_AXIS.normalize();
+    Y_AXIS.crossVectors(Z_AXIS, X_AXIS).normalize();
+    obj.quaternion.setFromRotationMatrix(BASIS.makeBasis(X_AXIS, Y_AXIS, Z_AXIS));
+    if (twist) obj.rotateZ(twist);
+    return;
+  }
+  if (kind === "bracelet") {
+    Y_AXIS.copy(along);
+    Z_AXIS.copy(CAM_DIR);
+    X_AXIS.crossVectors(Y_AXIS, Z_AXIS);
+    if (X_AXIS.lengthSq() < 1e-6) X_AXIS.set(1, 0, 0);
+    X_AXIS.normalize();
+    Z_AXIS.crossVectors(X_AXIS, Y_AXIS).normalize();
+    obj.quaternion.setFromRotationMatrix(BASIS.makeBasis(X_AXIS, Y_AXIS, Z_AXIS));
+    obj.rotateY(twist);
+    return;
+  }
+  obj.quaternion.identity();
+  obj.rotation.z = twist;
+}
+
+function TryOnJewel({
+  spec,
+  kind,
+  anchors,
+  scale,
+  twist,
+}: {
+  spec: JewelSpec;
+  kind: TryOnKind;
+  anchors: RefObject<TryOnAnchor[]>;
+  scale: number;
+  twist: number;
+}) {
+  const obj = useJewel(spec);
+  const group = useRef<THREE.Group>(null);
+  const left = useRef<THREE.Group>(null);
+  const right = useRef<THREE.Group>(null);
+  const { viewport } = useThree();
+  const pair = kind === "earring";
+
+  useEffect(() => {
+    if (!pair) return;
+    const kids = [...obj.children];
+    kids.forEach((child) => {
+      child.position.x = 0;
+    });
+    if (kids[0] && left.current) left.current.add(kids[0]);
+    if (kids[1] && right.current) right.current.add(kids[1]);
+    else if (kids[0] && right.current) right.current.add(kids[0].clone(true));
+    return () => {
+      kids.forEach((child) => obj.add(child));
+    };
+  }, [obj, pair]);
+
+  useFrame(() => {
+    const list = anchors.current;
+    if (!list || list.length === 0) return;
+
+    if (pair) {
+      const holders = [left.current, right.current];
+      holders.forEach((h, i) => {
+        const a = list[i] ?? list[0];
+        if (!h || !a) return;
+        h.position.set((a.x - 0.5) * viewport.width, (0.5 - a.y) * viewport.height, 0);
+        const feature = a.size * viewport.width * scale;
+        h.scale.setScalar(Math.max(feature / 0.72, 0.0001));
+        h.quaternion.identity();
+        h.rotation.z = twist + (i === 0 ? 0.08 : -0.08);
+      });
+      return;
+    }
+
+    const g = group.current;
+    const a = list[0];
+    if (!g || !a) return;
+    g.position.set((a.x - 0.5) * viewport.width, (0.5 - a.y) * viewport.height, 0);
+    const feature = a.size * viewport.width * scale;
+    const ref = holeRef(kind, spec.design);
+    const k = kind === "pendant" ? 0.72 : kind === "necklace" ? 1.15 : kind === "ring" ? 1.55 : 1.08;
+    g.scale.setScalar(Math.max((feature * k) / ref, 0.0001));
+    const along = new THREE.Vector3(Math.cos(a.angle), -Math.sin(a.angle), 0);
+    if (along.lengthSq() < 1e-6) along.set(0, 1, 0);
+    along.normalize();
+    poseJewel(g, kind, along, twist);
+  });
+
+  if (pair) {
+    return (
+      <>
+        <group ref={left} />
+        <group ref={right} />
+        <primitive object={obj} visible={false} />
+      </>
+    );
+  }
+
+  return (
+    <group ref={group}>
+      <primitive object={obj} />
+    </group>
+  );
+}
+
+export function TryOnScene({
+  spec,
+  kind,
+  anchors,
+  scale,
+  twist,
+  onCanvas,
+}: {
+  spec: JewelSpec;
+  kind: TryOnKind;
+  anchors: RefObject<TryOnAnchor[]>;
+  scale: number;
+  twist: number;
+  onCanvas?: (el: HTMLCanvasElement) => void;
+}) {
+  return (
+    <Canvas
+      orthographic
+      dpr={[1, 1.5]}
+      frameloop="always"
+      gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true, toneMapping: THREE.NeutralToneMapping, powerPreference: "high-performance" }}
+      camera={{ position: [0, 0, 40], zoom: 1, near: 0.1, far: 200 }}
+      onCreated={({ gl }) => onCanvas?.(gl.domElement)}
+      style={{ pointerEvents: "none" }}
+      aria-hidden
+    >
+      <Studio />
+      <TryOnJewel spec={spec} kind={kind} anchors={anchors} scale={scale} twist={twist} />
+    </Canvas>
   );
 }
 
