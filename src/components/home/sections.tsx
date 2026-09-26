@@ -120,14 +120,14 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   return <span ref={ref}>{v.toLocaleString("en-IN")}{suffix}</span>;
 }
 
-export function Craftsmanship({ image, detail }: { image: string; detail: string }) {
+export function Craftsmanship({ image, secondary }: { image: string; secondary: string }) {
   return (
     <section className="border-y border-line bg-surface">
       <div className="container-x grid-editorial section-y items-center gap-y-14">
         <div className="col-span-4 md:col-span-8 lg:col-span-6">
-          <div className="relative grid grid-cols-5 gap-4">
-            <Reveal className="relative col-span-3 aspect-[3/4] stage"><Image src={image} alt="A ring on the setter's bench" fill sizes="(min-width:1024px) 30vw, 60vw" className="jewel-shot" /></Reveal>
-            <Reveal delay={0.15} className="relative col-span-2 mt-24 aspect-[3/4] stage"><Image src={detail} alt="Close view of claw setting" fill sizes="(min-width:1024px) 20vw, 40vw" className="jewel-shot" /></Reveal>
+          <div className="relative grid grid-cols-5 items-end gap-4">
+            <Reveal className="relative col-span-3 aspect-[4/5] stage"><Image src={image} alt="A three-stone ring on the setter's bench" fill sizes="(min-width:1024px) 30vw, 60vw" className="jewel-shot" /></Reveal>
+            <Reveal delay={0.15} className="relative col-span-2 aspect-square stage"><Image src={secondary} alt="A solitaire ring, shown in full" fill sizes="(min-width:1024px) 20vw, 40vw" className="jewel-shot" /></Reveal>
           </div>
         </div>
         <div className="col-span-4 md:col-span-8 lg:col-span-5 lg:col-start-8">

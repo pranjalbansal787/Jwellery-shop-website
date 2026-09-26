@@ -34,7 +34,7 @@ export default async function Home() {
       case "hero": return <HeroStory key={id} data={heroData} />;
       case "collections": return <FeaturedCollections key={id} items={collections.slice(0, 3)} />;
       case "new-arrivals": return <ProductRail key={id} kicker="New arrivals" title={["Just arrived", "from the atelier"]} href="/shop?sort=newest" cta="Shop new" products={newest} />;
-      case "craftsmanship": return <Craftsmanship key={id} image={renderPath("aria-three-stone-oval", "white", "diamond")} detail={renderPath("aria-three-stone-oval", "white", "diamond", "detail")} />;
+      case "craftsmanship": return <Craftsmanship key={id} image={renderPath("aria-three-stone-oval", "white", "diamond")} secondary={renderPath("elan-solitaire-ring", "white", "diamond")} />;
       case "spotlight": return <Spotlight key={id} product={{ slug: spot!.slug, name: spot!.name, subtitle: spot!.subtitle, price: fromPrice(spot!), sku: spot!.sku }} spec={{ design: spot!.design, metal: spot!.defaultMetal, gem: spot!.defaultGem, shape: spot!.shape, size: spot!.gemSize }} />;
       case "categories": return <CategoryGrid key={id} items={catItems} />;
       case "occasions": return <Occasions key={id} />;
