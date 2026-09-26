@@ -313,6 +313,7 @@ export function ProductExperience({ p, collectionName, initialMetal }: { p: Prod
         <TryOn
           image={productImage(p, metal, gem)}
           name={p.name}
+          design={p.design}
           onAddToBag={() => { setDialog(null); addToBag(); }}
           optionsSlot={p.metals.length > 1 ? (
             <div>

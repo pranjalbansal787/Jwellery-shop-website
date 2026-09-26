@@ -55,16 +55,18 @@ export function HeroStory({ data }: { data: HeroData }) {
         <div className="absolute inset-0 stage" />
         <div className="absolute inset-0" style={{ background: "radial-gradient(60% 50% at 50% 45%, color-mix(in oklab, var(--accent) 12%, transparent), transparent 70%)" }} />
         {/* poster: server-rendered LCP image, cross-fades to live WebGL once ready */}
-        <motion.div className="absolute inset-0 flex items-center justify-center" animate={{ opacity: gl && ready ? 0 : 1 }} transition={{ duration: 0.5 }}>
-          <div className="relative h-[52svh] w-[min(76vw,460px)] -translate-y-[9svh]">
-            <Image src={data.posters[metal]} alt={`${data.name} in ${metal} gold`} fill preload sizes="(min-width:768px) 520px, 80vw" className="jewel-shot" />
-          </div>
-        </motion.div>
-        {gl && (
-          <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 1.4 }} data-cursor="explore">
-            <HeroScene spec={{ design: "solitaire", metal, gem: "diamond", shape: "round" }} progress={story ? scrollYProgress : undefined} level={level} active={inView} onReady={() => setTimeout(() => setReady(true), 250)} />
+        <div className="absolute inset-0 -translate-y-[8svh]">
+          <motion.div className="absolute inset-0 flex items-center justify-center" animate={{ opacity: gl && ready ? 0 : 1 }} transition={{ duration: 0.5 }}>
+            <div className="relative h-[52svh] w-[min(76vw,460px)] -translate-y-[9svh]">
+              <Image src={data.posters[metal]} alt={`${data.name} in ${metal} gold`} fill preload sizes="(min-width:768px) 520px, 80vw" className="jewel-shot" />
+            </div>
           </motion.div>
-        )}
+          {gl && (
+            <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 1.4 }} data-cursor="explore">
+              <HeroScene spec={{ design: "solitaire", metal, gem: "diamond", shape: "round" }} progress={story ? scrollYProgress : undefined} level={level} active={inView} onReady={() => setTimeout(() => setReady(true), 250)} />
+            </motion.div>
+          )}
+        </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg to-transparent" />
         {story ? (
           <StoryLayers progress={scrollYProgress} data={data} price={money(data.price)} />
@@ -104,30 +106,30 @@ function StoryLayers({ progress, data, price }: { progress: MotionValue<number>;
   const hideThree = useTransform(three.opacity, (o) => (o < 0.01 ? "hidden" : "visible"));
   return (
     <>
-      <motion.div style={{ ...one, visibility: hideOne }} className="absolute inset-0 flex flex-col items-center justify-end pb-[14svh] text-center">
+      <motion.div style={{ ...one, visibility: hideOne }} className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-[12svh] text-center">
         <p className="kicker text-accent">The Eternal Collection</p>
         <h1 className="display-2xl mt-5 max-w-[14ch]">
           Light, held <em className="italic text-metal">in gold</em>
         </h1>
-        <p className="lede mt-5 max-w-md px-6">A single brilliant, raised on six hand-shaped claws. Scroll to turn it in the light.</p>
+        <p className="lede mt-5 max-w-md">A single brilliant, raised on six hand-shaped claws. Scroll to turn it in the light.</p>
       </motion.div>
-      <motion.div style={{ ...two, visibility: hideTwo }} className="container-x absolute inset-0 grid items-center">
-        <div className="max-w-sm">
+      <motion.div style={{ ...two, visibility: hideTwo }} className="container-x absolute inset-x-0 bottom-0 pb-[12svh] text-center md:grid md:grid-cols-2 md:items-end md:text-left">
+        <div className="mx-auto max-w-sm md:mx-0">
           <p className="kicker text-accent">Craftsmanship</p>
           <p className="display-lg mt-4">Six claws, shaped by one hand</p>
           <p className="lede mt-4">Each claw is filed, burnished and set by a single master setter, then checked under 10× magnification before the ring leaves the atelier.</p>
         </div>
-        <ul className="absolute right-[var(--gutter)] top-1/2 hidden -translate-y-1/2 space-y-5 text-right md:block">
+        <ul className="mt-8 hidden space-y-5 text-right md:mt-0 md:block">
           {data.specs.map((s) => (
             <li key={s} className="border-r border-accent pr-4 text-[13px] uppercase tracking-[0.18em] text-muted">{s}</li>
           ))}
         </ul>
       </motion.div>
-      <motion.div style={{ ...three, visibility: hideThree }} className="absolute inset-x-0 bottom-[10svh] flex flex-col items-center text-center">
+      <motion.div style={{ ...three, visibility: hideThree }} className="absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-[10svh] text-center">
         <p className="kicker text-muted">Signature</p>
         <p className="display-xl mt-3">{data.name}</p>
         <p className="mt-3 text-muted">From {price}</p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3 px-6">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Magnetic><Link href={`/products/${data.slug}`} className="btn btn-primary">Discover the ring</Link></Magnetic>
           <Magnetic><Link href="/appointments?service=bridal" className="btn btn-outline">Book a private viewing</Link></Magnetic>
         </div>

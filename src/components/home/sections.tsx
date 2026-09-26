@@ -62,10 +62,16 @@ function CollectionTile({ c, className, tall }: { c: { slug: string; name: strin
       <Link ref={ref} href={`/collections/${c.slug}`} className="group relative block h-full overflow-hidden stage" data-cursor="explore">
         <div className={tall ? "aspect-[4/5] md:aspect-auto md:h-full md:min-h-[720px]" : "aspect-[16/11]"}>
           <motion.div style={{ y }} className="absolute inset-0">
-            <Image src={c.heroImage} alt="" fill sizes={tall ? "(min-width:768px) 58vw, 100vw" : "(min-width:768px) 42vw, 100vw"} className="jewel-shot" />
+            <Image
+              src={c.heroImage}
+              alt=""
+              fill
+              sizes={tall ? "(min-width:768px) 58vw, 100vw" : "(min-width:768px) 42vw, 100vw"}
+              className={tall ? "jewel-shot !object-[center_12%] !pb-[38%] !pt-[6%]" : "jewel-shot"}
+            />
           </motion.div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg/90 via-bg/30 to-transparent p-6 md:p-9">
+        <div className={`absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg via-bg/90 to-transparent px-6 pb-6 md:px-9 md:pb-9 ${tall ? "pt-28" : "pt-16"}`}>
           <p className="kicker text-accent">{c.kicker}</p>
           <p className={tall ? "display-lg mt-3" : "display-md mt-2"}>{c.name}</p>
           {tall && <p className="lede mt-3 max-w-md">{c.description}</p>}

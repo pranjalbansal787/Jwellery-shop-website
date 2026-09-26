@@ -95,11 +95,10 @@ function HeroJewel({ spec, progress, level }: { spec: JewelSpec; progress?: Moti
     const px = p < 0.04 ? 0 : pointer.x;
     const py = p < 0.04 ? 0 : pointer.y;
     desired.x += px * 0.35 * level;
-    desired.y += py * 0.2 * level + p * 0.3;
-    // Snap back at the top of the story so a fast scroll-up never leaves the camera inside the stone.
+    desired.y += py * 0.2 * level + p * 0.08;
     const k = p < 0.04 ? 1 : 1 - Math.pow(0.001, dt);
     cam.position.lerp(desired, k);
-    cam.lookAt(base.current.target.clone().setY(base.current.target.y + p * 0.35));
+    cam.lookAt(base.current.target.clone().setY(base.current.target.y + p * 0.1));
   });
 
   return (
