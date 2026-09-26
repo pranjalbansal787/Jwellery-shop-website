@@ -87,7 +87,7 @@ export class JewelTracker {
   hasNewFrame(source: TrackSource) {
     if (!(source instanceof HTMLVideoElement)) {
       this.lastVideoTime += 1;
-      return this.lastVideoTime <= 6;
+      return this.lastVideoTime <= 14;
     }
     const t = source.currentTime;
     if (t === this.lastVideoTime) return false;
@@ -170,22 +170,7 @@ function fromHand(
   mirror: boolean,
 ): TryOnAnchor[] | null {
   const W = world ?? [];
-  if (kind === "bangle" || kind === "bracelet") {
-    const wrist = lm[WRIST];
-    const mid = lm[MIDDLE_MCP];
-    const index = lm[INDEX_MCP];
-    const pinky = lm[PINKY_MCP];
-    if (!wrist || !mid || !index || !pinky) return null;
-    const palm = sub(mid, wrist);
-    const len = Math.hypot(palm.x, palm.y) || 1;
-    const raw = { x: wrist.x - (palm.x / len) * 0.07, y: wrist.y - (palm.y / len) * 0.07, z: wrist.z };
-    const a = map.pt(raw.x, raw.y);
-    const width = Math.max(map.seg(index, pinky) * 1.28, 0.11);
-    const along = viewAxis(W[WRIST] && W[MIDDLE_MCP] ? sub(W[WRIST], W[MIDDLE_MCP]) : palm, map, wrist, { x: wrist.x - palm.x, y: wrist.y - palm.y, z: wrist.z }, mirror);
-    const up = palmNormal(W, lm, map, mirror);
-    const angle = Math.atan2(palm.y, palm.x);
-    return [poseAnchor(a.x, a.y, angle, width, { ...along, ...up })];
-  }
+  if (kind === "bangle" || kind === "bracelet") return fromWrist(lm, W, kind, map, mirror);
 
   const mcp = lm[RING_MCP];
   const pip = lm[RING_PIP];
@@ -201,6 +186,44 @@ function fromHand(
   const up = palmNormal(W, lm, map, mirror);
   const angle = Math.atan2(pip.y - mcp.y, pip.x - mcp.x);
   return [poseAnchor(a.x, a.y, angle, width, { ...along, ...up })];
+}
+
+/** Wrist crease + forearm axis — not the knuckles, which made bangles sit like giant cuffs. */
+function fromWrist(
+  lm: NormalizedLandmark[],
+  world: Landmark[],
+  kind: TryOnKind,
+  map: Mapper,
+  mirror: boolean,
+): TryOnAnchor[] | null {
+  const wrist = lm[WRIST];
+  const mid = lm[MIDDLE_MCP];
+  const index = lm[INDEX_MCP];
+  const pinky = lm[PINKY_MCP];
+  if (!wrist || !mid || !index || !pinky) return null;
+
+  const palm = { x: wrist.x - mid.x, y: wrist.y - mid.y, z: (wrist.z ?? 0) - (mid.z ?? 0) };
+  const palmLen = Math.hypot(palm.x, palm.y) || 0.001;
+  const dir = { x: palm.x / palmLen, y: palm.y / palmLen };
+  // Sit on the distal forearm, just behind the wrist crease — where a kada actually rests.
+  const wear = { x: wrist.x + dir.x * palmLen * 0.2, y: wrist.y + dir.y * palmLen * 0.2, z: wrist.z };
+  const a = map.pt(wear.x, wear.y);
+
+  // Width at the crease (MCPs pulled back toward the wrist), not the knuckle span.
+  const creaseL = lerp(index, wrist, 0.8);
+  const creaseR = lerp(pinky, wrist, 0.8);
+  const crease = map.seg(creaseL, creaseR);
+  const palmSpan = map.seg(index, pinky);
+  const width = Math.max(crease * 1.14, palmSpan * 0.62, 0.075);
+
+  const far = { x: wear.x + dir.x, y: wear.y + dir.y, z: wear.z };
+  const worldAlong = world[WRIST] && world[MIDDLE_MCP] ? sub(world[WRIST], world[MIDDLE_MCP]) : palm;
+  const along = viewAxis(worldAlong, map, wear, far, mirror);
+  // Tilt the hole slightly toward the camera so the oval of the bangle is visible, not two edge-on bars.
+  const tilted = norm3({ ax: along.ax, ay: along.ay, az: clamp(along.az + (kind === "bangle" ? 0.38 : 0.22), -0.7, 0.7) });
+  const up = { ux: 0, uy: 0, uz: 1 };
+  const angle = Math.atan2(dir.y, dir.x);
+  return [poseAnchor(a.x, a.y, angle, width, { ...tilted, ...up })];
 }
 
 function fromFace(lm: NormalizedLandmark[], kind: TryOnKind, map: Mapper, xf?: number[]): TryOnAnchor[] | null {
@@ -341,7 +364,12 @@ function pickHand(
     const area = (maxX - minX) * (maxY - minY);
     const finger = Math.hypot((lm[RING_PIP]?.x ?? 0) - (lm[RING_MCP]?.x ?? 0), (lm[RING_PIP]?.y ?? 0) - (lm[RING_MCP]?.y ?? 0));
     const palm = Math.hypot((lm[MIDDLE_MCP]?.x ?? 0) - (lm[WRIST]?.x ?? 0), (lm[MIDDLE_MCP]?.y ?? 0) - (lm[WRIST]?.y ?? 0)) || 0.001;
-    const pose = kind === "ring" ? 0.55 + finger / palm : 1;
+    const wrist = lm[WRIST];
+    const margin = wrist ? Math.min(wrist.x, 1 - wrist.x, wrist.y, 1 - wrist.y) : 0;
+    const pose =
+      kind === "ring" ? 0.55 + finger / palm
+      : kind === "bangle" || kind === "bracelet" ? 0.7 + margin * 2.2 + palm * 0.8
+      : 1;
     const score = area * pose;
     if (score > bestScore) {
       bestScore = score;

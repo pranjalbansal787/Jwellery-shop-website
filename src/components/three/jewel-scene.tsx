@@ -166,8 +166,8 @@ const CAM_DIR = new THREE.Vector3(0, 0, 1);
 
 function holeRef(kind: TryOnKind, design: JewelSpec["design"]) {
   if (kind === "ring") return 1.05;
-  if (kind === "bangle") return 4.2;
-  if (kind === "bracelet") return 5.1;
+  if (kind === "bangle") return 5.2;
+  if (kind === "bracelet") return 6;
   if (kind === "necklace") return 5.4;
   if (kind === "pendant") return 3.6;
   if (design === "hoops") return 1.35;
@@ -190,7 +190,7 @@ function poseFromAnchor(kind: TryOnKind, a: TryOnAnchor, twist: number) {
 
   if (kind === "bracelet") {
     Y_AXIS.copy(Z_AXIS);
-    Z_AXIS.set(a.ux, a.uy, Math.max(a.uz, 0.35)).normalize();
+    Z_AXIS.copy(CAM_DIR);
     X_AXIS.crossVectors(Y_AXIS, Z_AXIS);
     if (X_AXIS.lengthSq() < 1e-6) X_AXIS.set(1, 0, 0);
     X_AXIS.normalize();
@@ -200,8 +200,19 @@ function poseFromAnchor(kind: TryOnKind, a: TryOnAnchor, twist: number) {
     return;
   }
 
-  if (kind === "ring" || kind === "bangle") {
-    Y_AXIS.lerp(CAM_DIR, kind === "ring" ? 0.42 : 0.28).normalize();
+  if (kind === "bangle") {
+    Y_AXIS.copy(CAM_DIR);
+    X_AXIS.crossVectors(Y_AXIS, Z_AXIS);
+    if (X_AXIS.lengthSq() < 1e-6) X_AXIS.set(1, 0, 0);
+    X_AXIS.normalize();
+    Y_AXIS.crossVectors(Z_AXIS, X_AXIS).normalize();
+    TARGET_QUAT.setFromRotationMatrix(BASIS.makeBasis(X_AXIS, Y_AXIS, Z_AXIS));
+    if (twist) TARGET_QUAT.multiply(TMP_QUAT.setFromAxisAngle(Z_AXIS, twist));
+    return;
+  }
+
+  if (kind === "ring") {
+    Y_AXIS.lerp(CAM_DIR, 0.42).normalize();
     X_AXIS.crossVectors(Y_AXIS, Z_AXIS);
     if (X_AXIS.lengthSq() < 1e-6) X_AXIS.crossVectors(CAM_DIR, Z_AXIS);
     if (X_AXIS.lengthSq() < 1e-6) X_AXIS.set(1, 0, 0);
@@ -222,10 +233,9 @@ function follow(obj: THREE.Object3D, snap: boolean, dt: number) {
     obj.scale.copy(TARGET_SCALE);
     return;
   }
-  const k = 1 - Math.exp(-dt * 16.5);
-  obj.position.lerp(TARGET_POS, k);
-  obj.quaternion.slerp(TARGET_QUAT, k);
-  obj.scale.lerp(TARGET_SCALE, k);
+  obj.position.lerp(TARGET_POS, 1 - Math.exp(-dt * 18));
+  obj.quaternion.slerp(TARGET_QUAT, 1 - Math.exp(-dt * 14));
+  obj.scale.lerp(TARGET_SCALE, 1 - Math.exp(-dt * 10));
 }
 
 function TryOnJewel({
@@ -294,7 +304,7 @@ function TryOnJewel({
     TARGET_POS.set((a.x - 0.5) * viewport.width, (0.5 - a.y) * viewport.height, 0);
     const feature = a.size * viewport.width * scale;
     const ref = holeRef(kind, spec.design);
-    const k = kind === "pendant" ? 0.72 : kind === "necklace" ? 1.15 : kind === "ring" ? 1.32 : 1.08;
+    const k = kind === "pendant" ? 0.72 : kind === "necklace" ? 1.15 : kind === "ring" ? 1.32 : kind === "bangle" ? 1.16 : 1;
     TARGET_SCALE.setScalar(Math.max((feature * k) / ref, 0.0001));
     poseFromAnchor(kind, a, twist);
     const far = !warmed.current || g.position.distanceTo(TARGET_POS) > viewport.width * 0.4;

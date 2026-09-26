@@ -70,7 +70,7 @@ function slot() {
   return {
     x: new OneEuro(1.2, 0.022),
     y: new OneEuro(1.2, 0.022),
-    size: new OneEuro(0.55, 0.01),
+    size: new OneEuro(0.42, 0.008),
     angle: new AngleEuro(),
     ax: new OneEuro(0.95, 0.014),
     ay: new OneEuro(0.95, 0.014),

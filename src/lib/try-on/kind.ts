@@ -58,19 +58,19 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   },
   bangle: {
     kind: "bangle",
-    pose: "Show your wrist and lower arm, not just the fingers.",
-    hint: "The bangle follows your wrist. Turn your arm and it stays around it.",
+    pose: "Show your wrist and forearm — the hand can be open, but keep the wrist in the centre.",
+    hint: "The bangle wraps the wrist. Turn your arm slowly and it stays around it.",
     camera: "environment",
-    scaleMin: 0.75,
-    scaleMax: 1.4,
+    scaleMin: 0.7,
+    scaleMax: 1.45,
   },
   bracelet: {
     kind: "bracelet",
-    pose: "Show the side of your wrist, as if fastening a clasp.",
+    pose: "Show your wrist from the side, forearm in frame, as if fastening a clasp.",
     hint: "The bracelet follows the wrist as you move. Keep the forearm in frame.",
     camera: "environment",
-    scaleMin: 0.75,
-    scaleMax: 1.4,
+    scaleMin: 0.7,
+    scaleMax: 1.45,
   },
   earring: {
     kind: "earring",
@@ -147,8 +147,8 @@ export function introTitle(kind: TryOnKind) {
 export function poseTip(kind: TryOnKind) {
   return {
     ring: "Best pose: back of the hand, natural daylight, one finger slightly forward.",
-    bangle: "Best pose: wrist and forearm at bangle height — not a close-up of the fingers.",
-    bracelet: "Best pose: the side of the wrist, as you would wear a tennis line.",
+    bangle: "Best pose: wrist and a little forearm, daylight, not a close-up of the fingers.",
+    bracelet: "Best pose: the side of the wrist and forearm, as you would wear a tennis line.",
     earring: "Best pose: a straight-on portrait with hair tucked behind both ears.",
     pendant: "Best pose: from the collarbones up, in a simple neckline.",
     necklace: "Best pose: neck and upper chest, shoulders relaxed.",

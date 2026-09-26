@@ -101,6 +101,10 @@ function StoryLayers({ progress, data, price }: { progress: MotionValue<number>;
   const three = { opacity: useLerp(progress, [0.66, 0.76], [0, 1]), y: useLerp(progress, [0.66, 0.76], [40, 0]) };
   const cue = useLerp(progress, [0, 0.08], [1, 0]);
   const bar = useTransform(progress, (v) => `${Math.min(100, Math.max(0, v * 100))}%`);
+  // Pinned to the viewport (not the sticky stage) so it never drifts when the mobile URL bar
+  // collapses or the section releases; fades out as the hero story ends.
+  const barOpacity = useLerp(progress, [0.94, 0.995], [1, 0]);
+  const barVisibility = useTransform(barOpacity, (o) => (o < 0.01 ? "hidden" : "visible"));
   const hideOne = useTransform(one.opacity, (o) => (o < 0.01 ? "hidden" : "visible"));
   const hideTwo = useTransform(two.opacity, (o) => (o < 0.01 ? "hidden" : "visible"));
   const hideThree = useTransform(three.opacity, (o) => (o < 0.01 ? "hidden" : "visible"));
@@ -138,7 +142,9 @@ function StoryLayers({ progress, data, price }: { progress: MotionValue<number>;
         <span className="kicker !text-[9.5px]">Scroll</span>
         <span className="h-10 w-px overflow-hidden bg-line"><motion.span className="block h-1/2 w-px bg-accent" animate={{ y: ["-100%", "200%"] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} /></span>
       </motion.div>
-      <div className="absolute bottom-0 left-0 h-px w-full bg-line"><motion.div className="h-px bg-accent" style={{ width: bar }} /></div>
+      <motion.div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-30 h-px bg-line" style={{ opacity: barOpacity, visibility: barVisibility }}>
+        <motion.div className="h-px bg-accent" style={{ width: bar }} />
+      </motion.div>
     </>
   );
 }
