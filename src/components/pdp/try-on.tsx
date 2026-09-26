@@ -19,7 +19,8 @@ import {
   type TryOnAnchor,
   type TryOnKind,
 } from "@/lib/try-on/kind";
-import { JewelTracker, smoothAnchors } from "@/lib/try-on/vision";
+import { PoseSmoother } from "@/lib/try-on/smooth";
+import { JewelTracker } from "@/lib/try-on/vision";
 
 const TryOnScene = dynamic(() => import("@/components/three/jewel-scene").then((m) => m.TryOnScene), { ssr: false });
 
@@ -64,6 +65,7 @@ export function TryOn({
   const tracker = useRef<JewelTracker | null>(null);
   const rawAnchors = useRef<TryOnAnchor[] | null>(null);
   const placedRef = useRef<TryOnAnchor[]>(fallbackAnchors(kind));
+  const smoother = useRef(new PoseSmoother());
   const nudgeRef = useRef(nudge);
   const missed = useRef(0);
   const drag = useRef<{ x: number; y: number; nx: number; ny: number } | null>(null);
@@ -82,6 +84,7 @@ export function TryOn({
     setBanner(true);
     setNudge({ x: 0, y: 0 });
     rawAnchors.current = null;
+    smoother.current.reset();
     writeAnchors(fallbackAnchors(kind));
   }, [kind, guide.camera]);
 
@@ -132,26 +135,30 @@ export function TryOn({
       const st = stage.current;
       const source: HTMLVideoElement | HTMLImageElement | null =
         phase === "live" ? video.current : photoImg.current;
+      const now = performance.now();
       if (t && st && source) {
         const readySrc =
           source instanceof HTMLVideoElement
             ? source.readyState >= 2 && source.videoWidth > 0
             : source.naturalWidth > 0;
-        if (readySrc) {
+        if (readySrc && t.hasNewFrame(source)) {
           try {
             const found = t.detect(source, kind, st.clientWidth, st.clientHeight, phase === "live" && facing === "user");
             if (found) {
               missed.current = 0;
-              writeAnchors(smoothAnchors(rawAnchors.current, found));
+              writeAnchors(smoother.current.push(found, now));
               setTrackState((s) => (s === "locked" ? s : "locked"));
               setBanner((open) => (open ? false : open));
-            } else {
+            } else if (!smoother.current.miss()) {
               missed.current += 1;
-              if (missed.current > 18) setTrackState((s) => (s === "searching" ? s : "searching"));
+              if (missed.current > 12) setTrackState((s) => (s === "searching" ? s : "searching"));
             }
           } catch {
             missed.current += 1;
           }
+        } else {
+          const held = smoother.current.sample(now);
+          if (held) writeAnchors(held);
         }
       }
       raf = requestAnimationFrame(tick);
@@ -183,11 +190,17 @@ export function TryOn({
     setBanner(true);
     missed.current = 0;
     rawAnchors.current = null;
+    smoother.current.reset();
     writeAnchors(fallbackAnchors(kind));
     try {
       stop();
       const s = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 960 } },
+        video: {
+          facingMode: { ideal: mode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 30, max: 30 },
+        },
         audio: false,
       });
       stream.current = s;
@@ -213,6 +226,7 @@ export function TryOn({
     setBanner(true);
     missed.current = 0;
     rawAnchors.current = null;
+    smoother.current.reset();
     writeAnchors(fallbackAnchors(kind));
     setPhase("photo");
     track("try_on_started", { product: name, mode: "photo", kind });

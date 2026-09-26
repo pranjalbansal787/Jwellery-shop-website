@@ -7,7 +7,36 @@ export type TryOnAnchor = {
   y: number;
   angle: number;
   size: number;
+  /** Finger / arm axis in view space (x right, y up, z toward camera). */
+  ax: number;
+  ay: number;
+  az: number;
+  /** Stone / facing direction in view space. */
+  ux: number;
+  uy: number;
+  uz: number;
 };
+
+export function poseAnchor(
+  x: number,
+  y: number,
+  angle: number,
+  size: number,
+  extra?: Partial<Pick<TryOnAnchor, "ax" | "ay" | "az" | "ux" | "uy" | "uz">>,
+): TryOnAnchor {
+  return {
+    x,
+    y,
+    angle,
+    size,
+    ax: extra?.ax ?? Math.cos(angle),
+    ay: extra?.ay ?? -Math.sin(angle),
+    az: extra?.az ?? 0,
+    ux: extra?.ux ?? 0,
+    uy: extra?.uy ?? 0,
+    uz: extra?.uz ?? 1,
+  };
+}
 
 export type TryOnGuide = {
   kind: TryOnKind;
@@ -22,7 +51,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   ring: {
     kind: "ring",
     pose: "Show the back of your hand, fingers slightly apart.",
-    hint: "The ring tracks your finger and wraps the band around it. Stay in daylight if you can.",
+    hint: "The ring follows your finger — turn your hand and it turns with you.",
     camera: "environment",
     scaleMin: 0.7,
     scaleMax: 1.45,
@@ -30,7 +59,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   bangle: {
     kind: "bangle",
     pose: "Show your wrist and lower arm, not just the fingers.",
-    hint: "The bangle sits around the wrist. Turn your arm slowly so it can find the opening.",
+    hint: "The bangle follows your wrist. Turn your arm and it stays around it.",
     camera: "environment",
     scaleMin: 0.75,
     scaleMax: 1.4,
@@ -38,7 +67,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   bracelet: {
     kind: "bracelet",
     pose: "Show the side of your wrist, as if fastening a clasp.",
-    hint: "The line follows the wrist, not the fingers. Keep the forearm in frame.",
+    hint: "The bracelet follows the wrist as you move. Keep the forearm in frame.",
     camera: "environment",
     scaleMin: 0.75,
     scaleMax: 1.4,
@@ -46,7 +75,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   earring: {
     kind: "earring",
     pose: "Use the front camera and keep both ears in frame.",
-    hint: "Each earring locks to an earlobe. Tuck hair behind the ears.",
+    hint: "Each earring stays on an earlobe as you turn your head.",
     camera: "user",
     scaleMin: 0.65,
     scaleMax: 1.6,
@@ -54,7 +83,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   pendant: {
     kind: "pendant",
     pose: "Use the front camera. Keep collarbones and the base of the neck in frame.",
-    hint: "The pendant rests on the chest, just below the collarbones.",
+    hint: "The pendant stays at the collarbone as you move.",
     camera: "user",
     scaleMin: 0.65,
     scaleMax: 1.55,
@@ -62,7 +91,7 @@ export const TRY_ON_GUIDE: Record<TryOnKind, TryOnGuide> = {
   necklace: {
     kind: "necklace",
     pose: "Use the front camera. Show the neck and upper chest.",
-    hint: "The necklace spans the collarbones and sits on the skin.",
+    hint: "The necklace stays on the collarbones as you move.",
     camera: "user",
     scaleMin: 0.7,
     scaleMax: 1.35,
@@ -83,17 +112,14 @@ export function needsFace(kind: TryOnKind) {
 }
 
 export function fallbackAnchors(kind: TryOnKind): TryOnAnchor[] {
-  if (kind === "ring") return [{ x: 0.54, y: 0.4, angle: -Math.PI / 2, size: 0.05 }];
-  if (kind === "bangle") return [{ x: 0.5, y: 0.64, angle: 0.2, size: 0.2 }];
-  if (kind === "bracelet") return [{ x: 0.5, y: 0.6, angle: 0.15, size: 0.18 }];
+  if (kind === "ring") return [poseAnchor(0.54, 0.4, -Math.PI / 2, 0.05)];
+  if (kind === "bangle") return [poseAnchor(0.5, 0.64, 0.2, 0.2)];
+  if (kind === "bracelet") return [poseAnchor(0.5, 0.6, 0.15, 0.18)];
   if (kind === "earring") {
-    return [
-      { x: 0.3, y: 0.38, angle: 0, size: 0.035 },
-      { x: 0.7, y: 0.38, angle: 0, size: 0.035 },
-    ];
+    return [poseAnchor(0.3, 0.38, 0, 0.035), poseAnchor(0.7, 0.38, 0, 0.035)];
   }
-  if (kind === "pendant") return [{ x: 0.5, y: 0.58, angle: 0, size: 0.24 }];
-  return [{ x: 0.5, y: 0.46, angle: 0, size: 0.34 }];
+  if (kind === "pendant") return [poseAnchor(0.5, 0.58, 0, 0.24)];
+  return [poseAnchor(0.5, 0.46, 0, 0.34)];
 }
 
 export function labelFor(kind: TryOnKind) {
