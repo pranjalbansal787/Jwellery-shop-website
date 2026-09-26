@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ tokens
+ * Runtime brand values (colours, fonts, radius, motion scale) are injected as CSS
+ * variables on <html> by the root layout from the brand configuration.
+ * Tailwind utilities below only ever reference these variables.            */
+
+@theme inline {
+  --color-bg: var(--background);
+  --color-fg: var(--foreground);
+  --color-surface: var(--surface);
+  --color-elevated: var(--surface-elevated);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-metal: var(--accent-metal);
+  --color-on-accent: var(--accent-contrast);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-stage: var(--stage);
+  --font-serif: var(--font-display), "Times New Roman", serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --ease-luxury: cubic-bezier(0.22, 0.61, 0.21, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --breakpoint-3xl: 108rem;
+}
+
+:root {
+  --duration-fast: 180ms;
+  --duration-normal: 420ms;
+  --duration-slow: 900ms;
+  --container: 1680px;
+  --gutter: clamp(1rem, 3.2vw, 3.5rem);
+  --header-h: 72px;
+  --z-header: 40;
+  --z-drawer: 60;
+  --z-overlay: 70;
+  --z-cursor: 100;
+  --ok: #7fb77e;
+  --warn: #d9a05b;
+  --danger: #d06a5f;
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+::selection { background: var(--accent); color: var(--accent-contrast); }
+
+/* Fine film grain — kept below perception threshold on light themes */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* hide native cursor only when the custom cursor is active */
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+
+/* ------------------------------------------------------------------ type */
+@utility font-display { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+@utility display-2xl { font-family: var(--font-serif); font-size: clamp(3rem, 7.4vw, 7.25rem); line-height: 0.96; letter-spacing: -0.025em; font-weight: 400; }
+@utility display-xl { font-family: var(--font-serif); font-size: clamp(2.5rem, 5.2vw, 5rem); line-height: 1; letter-spacing: -0.02em; font-weight: 400; }
+@utility display-lg { font-family: var(--font-serif); font-size: clamp(2rem, 3.6vw, 3.5rem); line-height: 1.05; letter-spacing: -0.015em; font-weight: 400; }
+@utility display-md { font-family: var(--font-serif); font-size: clamp(1.6rem, 2.4vw, 2.25rem); line-height: 1.12; letter-spacing: -0.01em; font-weight: 400; }
+@utility display-sm { font-family: var(--font-serif); font-size: clamp(1.25rem, 1.6vw, 1.5rem); line-height: 1.2; font-weight: 400; }
+@utility kicker { font-family: var(--font-sans); font-size: 11px; line-height: 1.4; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 500; }
+@utility caption { font-size: 12.5px; line-height: 1.5; letter-spacing: 0.02em; }
+@utility lede { font-size: clamp(1rem, 1.1vw, 1.125rem); line-height: 1.75; color: var(--muted); }
+
+/* ------------------------------------------------------------------ layout */
+@utility container-x { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+@utility grid-editorial { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: clamp(1rem, 2vw, 2rem);
+  @media (width >= 48rem) { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  @media (width >= 64rem) { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+@utility hairline { border-color: var(--border); }
+@utility section-y { padding-block: clamp(4.5rem, 10vw, 10rem); }
+
+/* ------------------------------------------------------------------ controls */
+@utility btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+  min-height: 3.25rem; padding: 0 1.9rem; border-radius: var(--radius-button);
+  font-size: 11.5px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 500;
+  transition: background-color var(--duration-normal) var(--ease-luxury), color var(--duration-normal) var(--ease-luxury), border-color var(--duration-normal) var(--ease-luxury), opacity var(--duration-fast);
+  white-space: nowrap; user-select: none;
+  &:disabled { opacity: 0.45; pointer-events: none; }
+}
+@utility btn-primary { background: var(--foreground); color: var(--background); &:hover { background: var(--accent-metal); color: var(--accent-contrast); } }
+@utility btn-accent { background: var(--accent); color: var(--accent-contrast); &:hover { background: var(--accent-metal); } }
+@utility btn-outline { border: 1px solid var(--border-strong); color: var(--foreground); &:hover { border-color: var(--foreground); } }
+@utility btn-sm { min-height: 2.5rem; padding: 0 1.1rem; font-size: 10.5px; }
+
+@utility link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+  transition: background-size var(--duration-normal) var(--ease-luxury);
+  &:hover, &:focus-visible, &[aria-current="page"] { background-size: 100% 1px; background-position: 0% 100%; }
+}
+
+@utility field {
+  width: 100%; min-height: 3.1rem; padding: 0.85rem 0; background: transparent; color: var(--foreground);
+  border-bottom: 1px solid var(--border-strong); font-size: 15px; border-radius: 0;
+  transition: border-color var(--duration-fast);
+  &::placeholder { color: var(--muted); opacity: 0.7; }
+  &:focus { outline: none; border-color: var(--accent); }
+}
+@utility field-box {
+  width: 100%; min-height: 2.75rem; padding: 0.6rem 0.8rem; background: var(--surface); color: var(--foreground);
+  border: 1px solid var(--border); font-size: 14px; border-radius: 2px;
+  &:focus { outline: none; border-color: var(--accent); }
+}
+
+@utility chip {
+  display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0 1rem;
+  border: 1px solid var(--border); font-size: 12.5px; letter-spacing: 0.02em; border-radius: var(--radius-button);
+  transition: border-color var(--duration-fast), background-color var(--duration-fast), color var(--duration-fast);
+  &:hover { border-color: var(--border-strong); }
+  &[aria-pressed="true"], &[aria-checked="true"], &[data-active="true"] { border-color: var(--foreground); background: var(--foreground); color: var(--background); }
+}
+
+@utility stage {
+  background: radial-gradient(120% 80% at 50% 38%, color-mix(in oklab, var(--stage) 70%, var(--foreground) 6%) 0%, var(--stage) 55%, color-mix(in oklab, var(--stage) 80%, black 20%) 100%);
+}
+
+@utility scrollbar-none { scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
+
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@utility skeleton {
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-elevated) 50%, var(--surface) 100%);
+  background-size: 200% 100%; animation: shimmer 1.6s linear infinite;
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  #printable-sizer, #printable-sizer * { visibility: visible !important; }
+  #printable-sizer { position: absolute; left: 0; top: 0; }
+  body::after { display: none; }
+}
+
+dialog.sheet { margin: 0; max-width: none; max-height: none; width: 100%; height: 100%; padding: 0; background: transparent; color: inherit; border: 0; }
+dialog.sheet::backdrop { background: rgb(0 0 0 / 0.6); backdrop-filter: blur(2px); }
+
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--accent); }
+input[type="checkbox"], input[type="radio"] { width: 1rem; height: 1rem; }
+
+/* Grid items never force their track wider than the viewport (canvas, long SKUs, images). */
+.grid > * { min-width: 0; }
