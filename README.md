@@ -59,3 +59,4 @@ CHROMIUM_PATH=/path/to/chrome FORCE=1 npm run render:jewellery
 
 Any Node host works (Vercel, Render, a VM). Set `NEXT_PUBLIC_SITE_URL` for canonical URLs and the sitemap. Because demo state lives in memory, orders placed during a demo persist only while that server instance is running.
 # Jwellery-shop-website
+# Jwellery-shop-website
